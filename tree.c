@@ -45,7 +45,7 @@ static void print_filename(const char *filename, unsigned char type) {
 }
 
 
-static void traverse_dirs(const char *dirname, int depth, bool last) {
+static void traverse_dirs(const char *dirname, int depth) {
     DIR *dir = opendir(dirname);
     assert(dir != NULL);
 
@@ -55,16 +55,8 @@ static void traverse_dirs(const char *dirname, int depth, bool last) {
 
         if (strcmp(name, ".") && strcmp(name, "..")) {
 
-            if (last) {
-                for (int _=0; _ < depth-1; ++_)
-                    printf("│   ");
-                printf("    ");
-
-            } else {
-                for (int _=0; _ < depth; ++_)
-                    printf("│   ");
-            }
-
+            for (int _=0; _ < depth; ++_)
+                printf("│   ");
 
             long pos = telldir(dir);
             bool is_last = readdir(dir) == NULL;
@@ -82,7 +74,7 @@ static void traverse_dirs(const char *dirname, int depth, bool last) {
             if (entry->d_type == DT_DIR) {
                 char namebuf[BUFSIZ] = { 0 };
                 snprintf(namebuf, ARRAY_LEN(namebuf) - 1, "%s/%s", dirname, name);
-                traverse_dirs(namebuf, depth+1, is_last);
+                traverse_dirs(namebuf, depth+1);
             }
         }
     }
@@ -95,7 +87,7 @@ int main(void) {
 
     const char *dir = ".";
     printf("%s%s%s%s\n", COLOR_BOLD, COLOR_BLUE, dir, COLOR_END);
-    traverse_dirs(dir, 0, false);
+    traverse_dirs(dir, 0);
 
     return 0;
 }
